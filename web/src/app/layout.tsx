@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import { Hanken_Grotesk, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
-import { Providers } from "@/components/providers";
-import { AppShell } from "@/components/shell/app-shell";
 
 const hanken = Hanken_Grotesk({
   variable: "--font-hanken",
@@ -26,11 +24,7 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className={`${hanken.variable} ${jetbrains.variable} h-full antialiased`}>
-      <body className="min-h-full">
-        <Providers>
-          <AppShell>{children}</AppShell>
-        </Providers>
-      </body>
+      <body className="min-h-full">{children}</body>
     </html>
   );
 }

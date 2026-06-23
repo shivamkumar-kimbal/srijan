@@ -38,16 +38,20 @@ open ../index.html                # prototype UI in browser
 
 ## Known issues / gotchas
 
-1. **Prod build fails on `/_not-found`.** `cd web && pnpm build` errors only on the auto
-   404 static prerender: `TypeError: Cannot read properties of null (reading 'useState')`.
-   This is a Turbopack + `@tanstack/react-query` + React 19.2 dispatcher quirk, **not** app
-   code — `pnpm dev` renders every route 200 with live data. Fix paths to try:
-   - Build without Turbopack (webpack) for the export step, or
-   - Pin React/react-dom to 19.0.x, or
-   - Make `components/providers.tsx` SSR-safe for the static 404 (e.g. render children
-     without QueryClientProvider when there's no client), or move providers below a route
-     group so the root `/_not-found` doesn't mount them.
-   Dev + all feature pages work today; this only blocks `next build`.
+1. **Prod build fails prerendering the builtin error pages** (`/_not-found`,
+   `/_global-error`): `TypeError: Cannot read properties of null (reading 'useContext'/'useState')`.
+   Reproduces on **both** Turbopack and `--webpack`, with React 19.2.4 **and** 19.1.1,
+   single React copy, and even with a custom `global-error.tsx` — the crash is inside Next's
+   own dist chunk during the static-export worker. Conclusion: a **Next 16.2.9 + React 19.x
+   framework prerender bug in this sandbox**, not app code. `pnpm dev` renders every route
+   200 with live data. Already applied: providers/shell moved into the `(app)` route group
+   so app pages don't pollute the root error pages (`src/app/(app)/layout.tsx`); that fixed
+   the providers-in-root case. Remaining fix paths to try when unblocked:
+   - Bump Next to a patch that fixes error-page prerender (preferred), or downgrade Next to a
+     known-good 15.x with React 19.0.x.
+   - As a stopgap for deploys, serve via `next dev`/a custom server, or investigate
+     `export const dynamic` / disabling static export of error routes.
+   This blocks ONLY `next build`; development and the running app are unaffected.
 2. **pnpm 11 build-scripts / deps-check.** Settings live in `web/pnpm-workspace.yaml`
    (`verifyDepsBeforeRun: false`, `onlyBuiltDependencies: [sharp, unrs-resolver]`), NOT the
    `pnpm` field in package.json (ignored) or `.npmrc`. An IDE linter may re-inject a

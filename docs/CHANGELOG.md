@@ -28,9 +28,14 @@ Unreleased = on `main`, not yet tagged.
 - Scaffold uses Next 16.2.9 (App Router compatible) rather than 15.
 - pnpm 11 settings moved to `pnpm-workspace.yaml` (`verifyDepsBeforeRun`, `onlyBuiltDependencies`).
 
+### Changed
+- Seed reduced to a single placeholder opportunity named **"test"** (no demo dataset).
+- Providers + app shell moved into `(app)` route group so root error pages don't mount them.
+
 ### Known issues
-- `pnpm build` fails only on `/_not-found` static prerender (Turbopack + React-Query +
-  React 19.2 `useState` null). Dev unaffected. See AGENTS.md Known issues #1.
+- `pnpm build` fails prerendering builtin error pages (`/_not-found`, `/_global-error`) —
+  `useContext`/`useState` null inside Next dist; reproduces on both bundlers and React
+  19.1/19.2. Framework prerender bug, not app code. Dev unaffected. See AGENTS.md #1.
 
 ### Pending (see TASKS.md)
 - Fix prod-build 404 prerender; mobile responsive; Post-Opportunity form.
