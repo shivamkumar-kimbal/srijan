@@ -42,10 +42,14 @@ _Last updated: 2026-06-23_
   Fix path: build w/o Turbopack, or pin React 19.0, or make providers SSR-safe. See AGENTS.md.
 - ⬜ Mobile responsive (sidebar → sheet)
 
-## M4 — Auth  ⬜
-- ⬜ Azure AD (Entra ID) app registration + OIDC in Next.js (NextAuth or MSAL)
-- ⬜ Backend: validate Entra JWT via JWKS (replace shared-secret stub)
-- ⬜ Role claims → Employee/Owner/Manager/Admin gating
+## M4 — Auth  🟡 (gated scaffold; needs real tenant to go live)
+- ✅ Backend: Entra JWKS validation middleware (`middleware/auth.go`), enforced when
+  `AZURE_TENANT_ID`+`AZURE_CLIENT_ID` set; open in dev. Build + dev-passthrough verified.
+- ✅ Frontend: Auth.js (NextAuth v5) Microsoft Entra ID provider, gated by `AUTH_ENABLED`;
+  middleware redirects to `/signin` when enabled; sign-in page; access token attached to
+  API calls via `lib/api.ts` token bridge. tsc clean; dev (auth off) verified.
+- ⬜ Real Entra app registration (tenant/client IDs/secret) — can't test login without it
+- ⬜ Role/app-role claims → Employee/Owner/Manager/Admin RBAC gating (server-side)
 
 ## M5 — Remaining modules  ⬜
 - ⬜ Automation Marketplace (assets, downloads, reuse, ratings) + S3 upload
@@ -67,10 +71,10 @@ _Last updated: 2026-06-23_
 - ⬜ K8s manifests / values per env (dev/staging/prod)
 
 ## % Complete (rough)
-- Backend: ~35% · Frontend: ~55% · Auth: 0% · Infra/Deploy: 0% · Docs: 95%
-- Overall MVP: ~35%
+- Backend: ~45% · Frontend: ~60% · Auth: ~70% (gated, needs tenant) · Infra/Deploy: 0% · Docs: 95%
+- Overall MVP: ~45%
 
 ## Immediate next 3 tasks
-1. Fix `/_not-found` prod-build prerender (Turbopack/React 19.2) — see AGENTS.md.
-2. Mobile responsive (sidebar → sheet); wire "Post Opportunity" form to POST /opportunities.
-3. Auth: Azure AD OIDC in Next.js + JWKS validation in Go (M4).
+1. Register real Entra app; flip `AUTH_ENABLED=true` + `AZURE_*`; test live login + RBAC.
+2. Fix `/_not-found` / `/_global-error` prod-build prerender — see AGENTS.md.
+3. Mobile responsive (sidebar → sheet); then M5 modules / M6–M7 infra.

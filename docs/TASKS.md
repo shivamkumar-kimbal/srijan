@@ -32,10 +32,11 @@ P1 = MVP-critical · P2 = MVP-nice · P3 = post-MVP.
 - [ ] Mobile responsive (sidebar → sheet)
 
 ### Auth
-- [ ] Entra ID app registration (redirect URIs, scopes)
-- [ ] Next.js OIDC (NextAuth or MSAL) + session
-- [ ] Backend JWKS validation, aud/iss/exp checks
-- [ ] Role/group → RBAC gates
+- [x] Next.js OIDC (Auth.js v5 Entra provider) + session + sign-in page (gated by AUTH_ENABLED)
+- [x] Backend JWKS validation, aud/iss/exp checks (gated by AZURE_TENANT_ID+AZURE_CLIENT_ID)
+- [x] Access token attached to API calls (lib/api.ts token bridge)
+- [ ] Entra ID app registration (redirect URIs, scopes) + live login test
+- [ ] Role/group → RBAC gates (server-side)
 
 ## P2
 - [ ] Team management (accept proposal → member, roles, milestones)

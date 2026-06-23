@@ -2,10 +2,21 @@ import type { Board, Insights, Opportunity, OppInput, Profile, ProposalInput } f
 
 const BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8080";
 
+// When auth is enabled, the Entra access token is attached to every API call.
+// Set from the client session (see components/providers). No-op in dev.
+let accessToken: string | undefined;
+export function setAccessToken(token?: string) {
+  accessToken = token;
+}
+
 async function req<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`${BASE}/api/v1${path}`, {
     ...init,
-    headers: { "Content-Type": "application/json", ...(init?.headers ?? {}) },
+    headers: {
+      "Content-Type": "application/json",
+      ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+      ...(init?.headers ?? {}),
+    },
   });
   if (!res.ok) {
     const body = await res.text();

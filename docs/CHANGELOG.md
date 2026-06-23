@@ -28,6 +28,13 @@ Unreleased = on `main`, not yet tagged.
 - Scaffold uses Next 16.2.9 (App Router compatible) rather than 15.
 - pnpm 11 settings moved to `pnpm-workspace.yaml` (`verifyDepsBeforeRun`, `onlyBuiltDependencies`).
 
+### Added (auth — gated)
+- Backend Entra ID (Azure AD) JWKS validation middleware (`MicahParks/keyfunc`), enforced
+  when `AZURE_TENANT_ID`+`AZURE_CLIENT_ID` set, open in dev.
+- Frontend Auth.js (NextAuth v5) Microsoft Entra ID provider, `/signin` page, middleware
+  guard, access-token bridge to API client. Gated by `AUTH_ENABLED` (off in dev).
+- `/post` page: create opportunity form → `POST /opportunities`.
+
 ### Changed
 - Seed reduced to a single placeholder opportunity named **"test"** (no demo dataset).
 - Providers + app shell moved into `(app)` route group so root error pages don't mount them.
