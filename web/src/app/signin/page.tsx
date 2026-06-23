@@ -10,7 +10,8 @@ export default function SignInPage() {
       <div className="w-full max-w-[380px] bg-white border border-[#ECEBE6] rounded-[16px] p-8 text-center shadow-[0_8px_30px_rgba(28,27,26,0.06)]">
         <div className="w-12 h-12 mx-auto rounded-[12px] bg-gradient-to-br from-[#5046E5] to-[#7C5BF0] mb-4" />
         <h1 className="text-[24px] font-extrabold tracking-[-0.5px]">Srijan</h1>
-        <p className="text-[14px] text-[#76746E] mt-1 mb-6">Where Ideas Become Impact</p>
+        <p className="font-mono text-[12px] text-[#9A988F] mt-1.5">नवसृजनमेव प्रगतिपथः।</p>
+        <p className="text-[14px] text-[#76746E] mt-1 mb-6">Innovation is the path of progress</p>
         <form
           action={async () => {
             "use server";

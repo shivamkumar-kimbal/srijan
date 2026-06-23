@@ -47,7 +47,7 @@ export function Sidebar() {
         </div>
         <div className="leading-none">
           <div className="font-extrabold text-[19px] tracking-[-0.4px]">Srijan</div>
-          <div className="font-mono text-[8.5px] text-muted-2 mt-0.5">सृजन · कर्मसु कौशलम्</div>
+          <div className="font-mono text-[8.5px] text-muted-2 mt-0.5">सृजन · नवसृजनमेव प्रगतिपथः।</div>
         </div>
       </div>
 

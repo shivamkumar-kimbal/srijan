@@ -55,6 +55,9 @@ export default function DashboardPage() {
         <Card className="overflow-hidden bg-gradient-to-r from-[#EEEDFD] to-[#F5EFFB] border-[#E5E1F7]">
           <div className="p-8 max-w-[560px]">
             <h1 className="text-[28px] font-extrabold tracking-[-0.6px] mb-2">Collaborate. Build. Grow.</h1>
+            <p className="font-mono text-[12.5px] text-[#7C5BF0] mb-3">
+              नवसृजनमेव प्रगतिपथः। · Innovation is the path of progress
+            </p>
             <p className="text-[14.5px] text-muted leading-relaxed mb-5">
               Post your ideas, collaborate with experts across departments, earn rewards and
               grow your career.
