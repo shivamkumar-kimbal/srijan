@@ -33,6 +33,22 @@ export interface Opportunity {
   roles: Role[];
 }
 
+export interface OppInput {
+  type: OppType;
+  title: string;
+  desc: string;
+  longDesc: string;
+  skills: string[];
+  days: number;
+  team: string;
+  ownerName: string;
+  ownerDept: string;
+  ownerInitials: string;
+  rewardBig: string;
+  rewardLabel: string;
+  rewardChips: string[];
+}
+
 export interface ProposalInput {
   why: string;
   experience: string;

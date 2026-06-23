@@ -1,12 +1,20 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "./api";
-import type { ProposalInput } from "./types";
+import type { OppInput, ProposalInput } from "./types";
 
 export const useOpportunities = (type?: string) =>
   useQuery({ queryKey: ["opportunities", type ?? "all"], queryFn: () => api.opportunities(type) });
 
 export const useOpportunity = (id: number) =>
   useQuery({ queryKey: ["opportunity", id], queryFn: () => api.opportunity(id), enabled: !!id });
+
+export const useCreateOpportunity = () => {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (body: OppInput) => api.createOpportunity(body),
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["opportunities"] }),
+  });
+};
 
 export const useProfile = () => useQuery({ queryKey: ["profile"], queryFn: api.profile });
 export const useInsights = () => useQuery({ queryKey: ["insights"], queryFn: api.insights });

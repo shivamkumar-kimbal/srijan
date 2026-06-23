@@ -1,4 +1,4 @@
-import type { Board, Insights, Opportunity, Profile, ProposalInput } from "./types";
+import type { Board, Insights, Opportunity, OppInput, Profile, ProposalInput } from "./types";
 
 const BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8080";
 
@@ -18,6 +18,8 @@ export const api = {
   opportunities: (type?: string) =>
     req<Opportunity[]>(`/opportunities${type && type !== "all" ? `?type=${type}` : ""}`),
   opportunity: (id: number) => req<Opportunity>(`/opportunities/${id}`),
+  createOpportunity: (body: OppInput) =>
+    req<Opportunity>("/opportunities", { method: "POST", body: JSON.stringify(body) }),
   submitProposal: (id: number, body: ProposalInput) =>
     req<unknown>(`/opportunities/${id}/proposals`, {
       method: "POST",

@@ -28,8 +28,8 @@ P1 = MVP-critical · P2 = MVP-nice · P3 = post-MVP.
 - [x] Profile page (GET /profile)
 - [x] Leaderboards / Insights (GET /insights)
 - [ ] Fix `/_not-found` prod-build prerender (Turbopack/React 19.2) — see AGENTS.md
+- [x] Wire "Post Opportunity" form → POST /opportunities (`/post` page)
 - [ ] Mobile responsive (sidebar → sheet)
-- [ ] Wire "Post Opportunity" form → POST /opportunities
 
 ### Auth
 - [ ] Entra ID app registration (redirect URIs, scopes)

@@ -95,7 +95,7 @@ export function Sidebar() {
       </div>
 
       <Link
-        href="/explore"
+        href="/post"
         className="mt-2.5 flex items-center justify-center gap-2 h-10 rounded-[9px] bg-primary text-white font-bold text-sm shadow-[0_2px_8px_rgba(80,70,229,0.3)]"
       >
         <Plus size={16} strokeWidth={2.4} /> Post Project

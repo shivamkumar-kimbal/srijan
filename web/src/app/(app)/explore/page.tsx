@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useOpportunities } from "@/lib/queries";
 import { useUIStore } from "@/lib/store";
 import { OpportunityCard } from "@/components/opportunity-card";
@@ -34,9 +35,11 @@ export default function ExplorePage() {
             Internal gigs, automations &amp; innovation challenges open across the org.
           </p>
         </div>
-        <Button className="ml-auto" size="md">
-          <Plus size={16} strokeWidth={2.2} /> Post Opportunity
-        </Button>
+        <Link href="/post" className="ml-auto">
+          <Button size="md">
+            <Plus size={16} strokeWidth={2.2} /> Post Opportunity
+          </Button>
+        </Link>
       </div>
 
       <div className="flex gap-2 flex-wrap mb-5">
