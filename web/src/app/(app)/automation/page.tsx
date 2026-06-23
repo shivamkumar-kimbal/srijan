@@ -2,10 +2,12 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Bot, Check, ChevronDown, Copy, GitBranch, Package } from "lucide-react";
+import { Bot, Check, ChevronDown, Copy, GitBranch, Package, Plus, Sparkles, X } from "lucide-react";
 import { useOpportunities } from "@/lib/queries";
+import { usePermission } from "@/lib/auth-store";
 import { OpportunityCard } from "@/components/opportunity-card";
 import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { SkillChip } from "@/components/ui/badge";
 
 interface Template {
@@ -91,13 +93,16 @@ helm install cost-exporter srijan/cost-exporter \\
 
 export default function AutomationPage() {
   const { data: gigs = [], isLoading } = useOpportunities("automation");
+  const canPublish = usePermission("automation:publish");
+  const [templates, setTemplates] = useState<Template[]>(TEMPLATES);
   const [reuses, setReuses] = useState<number[]>(TEMPLATES.map((t) => t.reuses));
   const [copied, setCopied] = useState<number | null>(null);
   const [expanded, setExpanded] = useState<number | null>(null);
+  const [publishing, setPublishing] = useState(false);
 
   async function copyTemplate(i: number) {
     try {
-      await navigator.clipboard.writeText(TEMPLATES[i].snippet);
+      await navigator.clipboard.writeText(templates[i].snippet);
     } catch {
       /* clipboard may be blocked; still record the reuse */
     }
@@ -106,18 +111,33 @@ export default function AutomationPage() {
     setTimeout(() => setCopied((c) => (c === i ? null : c)), 1600);
   }
 
+  function publishTemplate(t: Template) {
+    setTemplates((list) => [t, ...list]);
+    setReuses((r) => [t.reuses, ...r]);
+    setPublishing(false);
+  }
+
   return (
     <div className="animate-viewIn max-w-[1180px] mx-auto px-8 py-7 pb-20">
-      <h1 className="text-[27px] font-extrabold tracking-[-0.6px] mb-1">Automation Hub</h1>
-      <p className="text-[14.5px] text-muted mb-6">
-        Publish &amp; reuse Terraform, Actions, K8s templates and agents — and pick up automation gigs.
-      </p>
+      <div className="flex items-start justify-between gap-4 mb-6">
+        <div>
+          <h1 className="text-[27px] font-extrabold tracking-[-0.6px] mb-1">Automation Hub</h1>
+          <p className="text-[14.5px] text-muted">
+            Publish &amp; reuse Terraform, Actions, K8s templates and agents — and pick up automation gigs.
+          </p>
+        </div>
+        {canPublish && (
+          <Button onClick={() => setPublishing(true)} className="flex-none">
+            <Plus size={17} /> Publish template
+          </Button>
+        )}
+      </div>
 
       <div className="font-extrabold text-[13px] tracking-wide uppercase text-muted-2 mb-3">
         Reusable templates
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 mb-8">
-        {TEMPLATES.map((t, i) => {
+        {templates.map((t, i) => {
           const isOpen = expanded === i;
           return (
             <Card key={t.name} className="p-[17px_19px] flex flex-col">
@@ -190,6 +210,122 @@ export default function AutomationPage() {
           ))}
         </div>
       )}
+
+      {publishing && (
+        <PublishTemplateModal onClose={() => setPublishing(false)} onPublish={publishTemplate} />
+      )}
+    </div>
+  );
+}
+
+const inputCls =
+  "w-full rounded-[9px] border border-[#E2E1DB] bg-white px-3 py-2 text-[13.5px] outline-none focus:border-primary focus:ring-2 focus:ring-primary/15 transition";
+
+function PublishTemplateModal({
+  onClose,
+  onPublish,
+}: {
+  onClose: () => void;
+  onPublish: (t: Template) => void;
+}) {
+  const [name, setName] = useState("");
+  const [desc, setDesc] = useState("");
+  const [tags, setTags] = useState("");
+  const [snippet, setSnippet] = useState("");
+
+  const valid = name.trim().length > 2 && snippet.trim().length > 4;
+
+  function submit() {
+    if (!valid) return;
+    onPublish({
+      icon: Sparkles,
+      name: name.trim(),
+      desc: desc.trim() || "Reusable automation template.",
+      reuses: 0,
+      tags: tags
+        .split(",")
+        .map((s) => s.trim())
+        .filter(Boolean),
+      snippet: snippet.trim(),
+    });
+  }
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4"
+      onClick={onClose}
+    >
+      <Card
+        className="w-full max-w-[560px] max-h-[90vh] overflow-y-auto p-7"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-start justify-between mb-1">
+          <div>
+            <h2 className="text-[20px] font-extrabold tracking-[-0.4px]">Publish a template</h2>
+            <p className="text-[13px] text-muted-2 mt-0.5">
+              Share a reusable automation for the whole org.
+            </p>
+          </div>
+          <button onClick={onClose} className="text-muted-2 hover:text-ink p-1 -mr-1">
+            <X size={20} />
+          </button>
+        </div>
+
+        <div className="flex flex-col gap-3.5 mt-5">
+          <label className="block">
+            <span className="block text-[12.5px] font-semibold text-muted mb-1.5">
+              Template name *
+            </span>
+            <input
+              autoFocus
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="e.g. GitLab CI · Canary Deploy"
+              className={inputCls}
+            />
+          </label>
+          <label className="block">
+            <span className="block text-[12.5px] font-semibold text-muted mb-1.5">Description</span>
+            <textarea
+              value={desc}
+              onChange={(e) => setDesc(e.target.value)}
+              rows={2}
+              placeholder="What does it do and when to use it?"
+              className={`${inputCls} resize-none`}
+            />
+          </label>
+          <label className="block">
+            <span className="block text-[12.5px] font-semibold text-muted mb-1.5">
+              Tags (comma separated)
+            </span>
+            <input
+              value={tags}
+              onChange={(e) => setTags(e.target.value)}
+              placeholder="CI/CD, YAML"
+              className={inputCls}
+            />
+          </label>
+          <label className="block">
+            <span className="block text-[12.5px] font-semibold text-muted mb-1.5">Snippet *</span>
+            <textarea
+              value={snippet}
+              onChange={(e) => setSnippet(e.target.value)}
+              rows={7}
+              placeholder="Paste the template code / config here…"
+              className={`${inputCls} resize-none font-mono text-[12px]`}
+            />
+          </label>
+
+          <div className="flex items-center justify-end gap-2.5 mt-2">
+            <Button variant="secondary" onClick={onClose}>
+              Cancel
+            </Button>
+            <Button onClick={submit} disabled={!valid}>
+              Publish
+            </Button>
+          </div>
+        </div>
+      </Card>
     </div>
   );
 }

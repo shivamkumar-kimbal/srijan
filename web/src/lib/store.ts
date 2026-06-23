@@ -7,6 +7,14 @@ export interface ProfileEdits {
   status?: string;
 }
 
+export interface DiscussionMsg {
+  id: string;
+  author: string;
+  initials: string;
+  text: string;
+  at: string;
+}
+
 interface UIState {
   filter: string;
   setFilter: (f: string) => void;
@@ -14,6 +22,8 @@ interface UIState {
   toggleAvailable: () => void;
   profileEdits: ProfileEdits;
   setProfileEdits: (edits: ProfileEdits) => void;
+  discussions: Record<number, DiscussionMsg[]>;
+  addMessage: (oppId: number, msg: Omit<DiscussionMsg, "id" | "at">) => void;
 }
 
 // Falls back to an in-memory store when localStorage is unavailable
@@ -44,11 +54,22 @@ export const useUIStore = create<UIState>()(
       profileEdits: {},
       setProfileEdits: (edits) =>
         set((s) => ({ profileEdits: { ...s.profileEdits, ...edits } })),
+      discussions: {},
+      addMessage: (oppId, msg) =>
+        set((s) => ({
+          discussions: {
+            ...s.discussions,
+            [oppId]: [
+              ...(s.discussions[oppId] ?? []),
+              { ...msg, id: `m-${Date.now().toString(36)}`, at: new Date().toISOString() },
+            ],
+          },
+        })),
     }),
     {
       name: "srijan-ui",
       storage: createJSONStorage(() => safeStorage),
-      partialize: (s) => ({ profileEdits: s.profileEdits }),
+      partialize: (s) => ({ profileEdits: s.profileEdits, discussions: s.discussions }),
     }
   )
 );

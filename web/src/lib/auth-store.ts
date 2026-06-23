@@ -39,18 +39,23 @@ export interface SessionUser {
 interface AuthState {
   currentUserId: string | null;
   roleOverrides: Record<string, Role>;
+  extraUsers: DemoUser[];
   login: (email: string, password: string) => boolean;
   logout: () => void;
   setRole: (userId: string, role: Role) => void;
+  addUser: (input: Omit<DemoUser, "id">) => { ok: boolean; error?: string };
+  removeUser: (userId: string) => void;
 }
 
 export const useAuthStore = create<AuthState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       currentUserId: null,
       roleOverrides: {},
+      extraUsers: [],
       login: (email, password) => {
-        const match = USERS.find(
+        const all = [...USERS, ...get().extraUsers];
+        const match = all.find(
           (u) =>
             u.email.toLowerCase() === email.trim().toLowerCase() &&
             u.password === password
@@ -62,6 +67,25 @@ export const useAuthStore = create<AuthState>()(
       logout: () => set({ currentUserId: null }),
       setRole: (userId, role) =>
         set((s) => ({ roleOverrides: { ...s.roleOverrides, [userId]: role } })),
+      addUser: (input) => {
+        const email = input.email.trim().toLowerCase();
+        const exists = [...USERS, ...get().extraUsers].some(
+          (u) => u.email.toLowerCase() === email
+        );
+        if (exists) return { ok: false, error: "That email already exists." };
+        const user: DemoUser = {
+          ...input,
+          email: input.email.trim(),
+          id: `u-${Date.now().toString(36)}`,
+        };
+        set((s) => ({ extraUsers: [...s.extraUsers, user] }));
+        return { ok: true };
+      },
+      removeUser: (userId) =>
+        set((s) => ({
+          extraUsers: s.extraUsers.filter((u) => u.id !== userId),
+          currentUserId: s.currentUserId === userId ? null : s.currentUserId,
+        })),
     }),
     {
       name: "srijan-auth",
@@ -69,6 +93,12 @@ export const useAuthStore = create<AuthState>()(
     }
   )
 );
+
+// All users = seed accounts plus any added by an admin at runtime.
+export function useAllUsers(): DemoUser[] {
+  const extra = useAuthStore((s) => s.extraUsers);
+  return [...USERS, ...extra];
+}
 
 // Effective role for a user (config role unless an admin overrode it).
 export function effectiveRole(user: DemoUser, overrides: Record<string, Role>): Role {
@@ -78,8 +108,9 @@ export function effectiveRole(user: DemoUser, overrides: Record<string, Role>): 
 export function useCurrentUser(): SessionUser | null {
   const id = useAuthStore((s) => s.currentUserId);
   const overrides = useAuthStore((s) => s.roleOverrides);
+  const extra = useAuthStore((s) => s.extraUsers);
   if (!id) return null;
-  const u = USERS.find((x) => x.id === id);
+  const u = [...USERS, ...extra].find((x) => x.id === id);
   if (!u) return null;
   const { password: _pw, ...rest } = u;
   void _pw;
