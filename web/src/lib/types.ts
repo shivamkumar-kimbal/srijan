@@ -56,6 +56,19 @@ export interface ProposalInput {
   authorName?: string;
 }
 
+export interface ProposalRow {
+  id: number;
+  opportunityId: number;
+  authorName: string;
+  why: string;
+  experience: string;
+  weeklyHours: number;
+  status: "submitted" | "accepted" | "rejected";
+  createdAt: string;
+  opportunityTitle: string;
+  opportunityType: OppType;
+}
+
 export interface Profile {
   name: string;
   title: string;

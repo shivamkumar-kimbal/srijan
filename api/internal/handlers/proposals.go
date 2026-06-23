@@ -56,3 +56,29 @@ func (h ProposalHandler) ListForOpportunity(c *gin.Context) {
 	h.DB.Where("opportunity_id = ?", oppID).Order("id desc").Find(&ps)
 	c.JSON(http.StatusOK, ps)
 }
+
+// proposalRow is a proposal enriched with its opportunity context for the
+// "My Proposals" list view.
+type proposalRow struct {
+	models.Proposal
+	OpportunityTitle string `json:"opportunityTitle"`
+	OpportunityType  string `json:"opportunityType"`
+}
+
+// ListAll returns every proposal, newest first, joined with its opportunity.
+// Optional ?author= filters to a single contributor (used by the My Proposals page).
+func (h ProposalHandler) ListAll(c *gin.Context) {
+	rows := []proposalRow{}
+	q := h.DB.Table("proposals").
+		Select("proposals.*, opportunities.title AS opportunity_title, opportunities.type AS opportunity_type").
+		Joins("LEFT JOIN opportunities ON opportunities.id = proposals.opportunity_id").
+		Order("proposals.id DESC")
+	if a := c.Query("author"); a != "" {
+		q = q.Where("proposals.author_name = ?", a)
+	}
+	if err := q.Scan(&rows).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, rows)
+}

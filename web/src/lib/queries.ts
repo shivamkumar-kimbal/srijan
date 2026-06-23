@@ -16,6 +16,9 @@ export const useCreateOpportunity = () => {
   });
 };
 
+export const useProposals = (author?: string) =>
+  useQuery({ queryKey: ["proposals", author ?? "all"], queryFn: () => api.proposals(author) });
+
 export const useProfile = () => useQuery({ queryKey: ["profile"], queryFn: api.profile });
 export const useInsights = () => useQuery({ queryKey: ["insights"], queryFn: api.insights });
 export const useBoard = () => useQuery({ queryKey: ["board"], queryFn: api.board });

@@ -53,6 +53,7 @@ func main() {
 		api.POST("/opportunities", opp.Create)
 		api.GET("/opportunities/:id/proposals", prop.ListForOpportunity)
 		api.POST("/opportunities/:id/proposals", prop.Submit)
+		api.GET("/proposals", prop.ListAll)
 		api.GET("/profile", handlers.Profile)
 		api.GET("/insights", handlers.Insights)
 		api.GET("/board", handlers.Board)

@@ -1,12 +1,26 @@
 "use client";
 
+import { useState } from "react";
+import { Pencil, X } from "lucide-react";
 import { useProfile } from "@/lib/queries";
+import { useUIStore } from "@/lib/store";
 import { Card } from "@/components/ui/card";
 import { Badge, SkillChip } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 
 export default function ProfilePage() {
-  const { data: p, isLoading } = useProfile();
-  if (isLoading || !p) return <div className="p-10 text-muted-2">Loading…</div>;
+  const { data: raw, isLoading } = useProfile();
+  const edits = useUIStore((s) => s.profileEdits);
+  const [editing, setEditing] = useState(false);
+  if (isLoading || !raw) return <div className="p-10 text-muted-2">Loading…</div>;
+
+  // Merge persisted local edits over the fetched profile.
+  const p = {
+    ...raw,
+    name: edits.name ?? raw.name,
+    title: edits.title ?? raw.title,
+    status: edits.status ?? raw.status,
+  };
 
   return (
     <div className="animate-viewIn max-w-[1080px] mx-auto px-8 py-7 pb-20">
@@ -26,6 +40,14 @@ export default function ProfilePage() {
             ))}
           </div>
         </div>
+        <Button
+          variant="secondary"
+          size="md"
+          className="ml-auto self-start"
+          onClick={() => setEditing(true)}
+        >
+          <Pencil size={15} /> Edit Profile
+        </Button>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3.5 mb-3.5">
@@ -100,7 +122,98 @@ export default function ProfilePage() {
           </div>
         </div>
       </div>
+      {editing && (
+        <EditProfileModal
+          initial={{ name: p.name, title: p.title, status: p.status }}
+          onClose={() => setEditing(false)}
+        />
+      )}
     </div>
+  );
+}
+
+function EditProfileModal({
+  initial,
+  onClose,
+}: {
+  initial: { name: string; title: string; status: string };
+  onClose: () => void;
+}) {
+  const setProfileEdits = useUIStore((s) => s.setProfileEdits);
+  const [name, setName] = useState(initial.name);
+  const [title, setTitle] = useState(initial.title);
+  const [status, setStatus] = useState(initial.status);
+
+  function save(e: React.FormEvent) {
+    e.preventDefault();
+    setProfileEdits({ name: name.trim(), title: title.trim(), status: status.trim() });
+    onClose();
+  }
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4 animate-viewIn"
+      onMouseDown={onClose}
+    >
+      <Card
+        className="w-full max-w-[440px] p-6"
+        onMouseDown={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between mb-5">
+          <h2 className="text-[18px] font-extrabold tracking-[-0.4px]">Edit Profile</h2>
+          <button onClick={onClose} className="text-muted-2 hover:text-ink" aria-label="close">
+            <X size={18} />
+          </button>
+        </div>
+        <form onSubmit={save} className="flex flex-col gap-4">
+          <Field label="Full name">
+            <input
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+              className="w-full h-10 px-3 rounded-[9px] border border-[#E7E6E0] bg-[#FCFCFB] text-[14px] outline-none focus:border-primary"
+            />
+          </Field>
+          <Field label="Title / role">
+            <input
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              required
+              className="w-full h-10 px-3 rounded-[9px] border border-[#E7E6E0] bg-[#FCFCFB] text-[14px] outline-none focus:border-primary"
+            />
+          </Field>
+          <Field label="Status">
+            <select
+              value={status}
+              onChange={(e) => setStatus(e.target.value)}
+              className="w-full h-10 px-3 rounded-[9px] border border-[#E7E6E0] bg-[#FCFCFB] text-[14px] outline-none focus:border-primary"
+            >
+              <option>Available</option>
+              <option>Busy</option>
+              <option>On a project</option>
+              <option>Away</option>
+            </select>
+          </Field>
+          <div className="flex justify-end gap-2.5 mt-1">
+            <Button type="button" variant="secondary" size="md" onClick={onClose}>
+              Cancel
+            </Button>
+            <Button type="submit" size="md">
+              Save changes
+            </Button>
+          </div>
+        </form>
+      </Card>
+    </div>
+  );
+}
+
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <label className="block">
+      <span className="block text-[12px] font-semibold text-muted-2 mb-1.5">{label}</span>
+      {children}
+    </label>
   );
 }
 
