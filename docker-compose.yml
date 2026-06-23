@@ -1,0 +1,47 @@
+# Local full-stack: Postgres 17 + Go API + Next.js web.
+# Usage: docker compose up --build
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: srijan
+      POSTGRES_PASSWORD: secret
+      POSTGRES_DB: srijan
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U srijan"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  api:
+    build: ./api
+    environment:
+      PORT: "8080"
+      DB_DRIVER: postgres
+      DATABASE_URL: "postgres://srijan:secret@postgres:5432/srijan?sslmode=disable"
+      CORS_ORIGIN: "http://localhost:3000"
+      # Set AZURE_TENANT_ID + AZURE_CLIENT_ID to enforce Entra auth.
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  web:
+    build:
+      context: ./web
+    environment:
+      NEXT_PUBLIC_API_URL: "http://localhost:8080"
+      AUTH_ENABLED: "false"
+      AUTH_SECRET: "dev-secret-not-for-prod"
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api
+
+volumes:
+  pgdata:

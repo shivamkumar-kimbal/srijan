@@ -59,14 +59,18 @@ _Last updated: 2026-06-23_
 - ⬜ AI Talent Matching (skills/reputation/availability scoring)
 - ⬜ Team collaboration: milestones, deliverables, member management
 
-## M6 — Data & infra  ⬜
-- ⬜ PostgreSQL 17 + migrations (golang-migrate), seed split dev/prod
-- ⬜ Dockerfiles (api multi-stage; web standalone)
-- ⬜ docker-compose for local (api + web + postgres)
+## M6 — Data & infra  🟡
+- ✅ Dockerfiles: api multi-stage (golang:1.26-alpine → distroless static, CGO off);
+  web standalone (node:22-alpine, `output: standalone`)
+- ✅ docker-compose (postgres:17 + api + web), Postgres DSN wired, healthcheck
+- ✅ `.dockerignore` for both
+- ⬜ PostgreSQL 17 migrations (golang-migrate); seed split dev/prod
+- ⬜ Actually build/run compose (Docker daemon was offline in dev session)
 
-## M7 — Deployment  ⬜
+## M7 — Deployment  🟡
+- ✅ GitHub Actions CI (`ci.yml`): api go vet/build/test; web pnpm install/lint/tsc/build on Node 22
+- ✅ GitHub Actions images (`images.yml`): build+push api & web to GHCR on main/tags
 - ⬜ Helm chart (api, web, ingress, secrets)
-- ⬜ GitHub Actions (lint, test, build, push images)
 - ⬜ ArgoCD app manifests (GitOps)
 - ⬜ K8s manifests / values per env (dev/staging/prod)
 

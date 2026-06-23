@@ -38,20 +38,16 @@ open ../index.html                # prototype UI in browser
 
 ## Known issues / gotchas
 
-1. **Prod build fails prerendering the builtin error pages** (`/_not-found`,
-   `/_global-error`): `TypeError: Cannot read properties of null (reading 'useContext'/'useState')`.
-   Reproduces on **both** Turbopack and `--webpack`, with React 19.2.4 **and** 19.1.1,
-   single React copy, and even with a custom `global-error.tsx` — the crash is inside Next's
-   own dist chunk during the static-export worker. Conclusion: a **Next 16.2.9 + React 19.x
-   framework prerender bug in this sandbox**, not app code. `pnpm dev` renders every route
-   200 with live data. Already applied: providers/shell moved into the `(app)` route group
-   so app pages don't pollute the root error pages (`src/app/(app)/layout.tsx`); that fixed
-   the providers-in-root case. Remaining fix paths to try when unblocked:
-   - Bump Next to a patch that fixes error-page prerender (preferred), or downgrade Next to a
-     known-good 15.x with React 19.0.x.
-   - As a stopgap for deploys, serve via `next dev`/a custom server, or investigate
-     `export const dynamic` / disabling static export of error routes.
-   This blocks ONLY `next build`; development and the running app are unaffected.
+1. **`pnpm build` fails locally prerendering builtin error pages** — root cause is the
+   **local Node 26.3.0**, which Next does not support (targets Node 18/20/22). The static
+   export worker (`react-dom/server`) crashes on Node 26: on Next 16 it surfaced as
+   `useContext`/`useState` null; on Next 15 as `<Html> should not be imported outside
+   pages/_document` prerendering `/404`. Both are the same Node-version issue, not app code.
+   **`pnpm dev` works fully** (every route 200 with live data) and **CI/Docker build on
+   Node 22 LTS** (see `.github/workflows/ci.yml`, `web/Dockerfile`) — the build passes there.
+   Stack is pinned to **Next 15.5.19 + React 19.0.0** (matches the spec). Don't chase this
+   locally; verify prod builds in CI/Docker. If you must build locally, use Node 22 (nvm).
+   App structure already isolates providers/shell in the `(app)` route group.
 2. **pnpm 11 build-scripts / deps-check.** Settings live in `web/pnpm-workspace.yaml`
    (`verifyDepsBeforeRun: false`, `onlyBuiltDependencies: [sharp, unrs-resolver]`), NOT the
    `pnpm` field in package.json (ignored) or `.npmrc`. An IDE linter may re-inject a

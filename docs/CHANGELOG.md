@@ -35,9 +35,20 @@ Unreleased = on `main`, not yet tagged.
   guard, access-token bridge to API client. Gated by `AUTH_ENABLED` (off in dev).
 - `/post` page: create opportunity form → `POST /opportunities`.
 
+### Added (infra)
+- Dockerfiles: api (golang:1.26 → distroless static, CGO off), web (node:22 standalone).
+- docker-compose: postgres:17 + api + web with Postgres DSN + healthcheck.
+- GitHub Actions: `ci.yml` (api vet/build/test; web lint/tsc/build on Node 22),
+  `images.yml` (build+push api/web to GHCR).
+
 ### Changed
+- **Pinned to Next 15.5.19 + React 19.0.0** (matches spec; was Next 16.2.9). `output: standalone`.
 - Seed reduced to a single placeholder opportunity named **"test"** (no demo dataset).
 - Providers + app shell moved into `(app)` route group so root error pages don't mount them.
+
+### Notes
+- Local `pnpm build` fails only due to **Node 26** (Next unsupported); CI/Docker on Node 22
+  builds fine. Dev works fully. See AGENTS.md #1.
 
 ### Known issues
 - `pnpm build` fails prerendering builtin error pages (`/_not-found`, `/_global-error`) —

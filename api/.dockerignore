@@ -1,0 +1,5 @@
+srijan.db
+server
+*.test
+*.log
+.git
