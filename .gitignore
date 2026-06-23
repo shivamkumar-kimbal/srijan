@@ -1,7 +1,7 @@
-# Go
-api/srijan.db
-api/server
-api/*.test
+# # Go
+# api/srijan.db
+# api/server
+# api/*.test
 
 # Node / Next
 web/node_modules
