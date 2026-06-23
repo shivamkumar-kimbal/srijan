@@ -27,6 +27,8 @@ const safeStorage = {
     hasLS() ? window.localStorage.removeItem(k) : void memory.delete(k),
 };
 
+let userSeq = 0;
+
 export interface SessionUser {
   id: string;
   name: string;
@@ -76,7 +78,7 @@ export const useAuthStore = create<AuthState>()(
         const user: DemoUser = {
           ...input,
           email: input.email.trim(),
-          id: `u-${Date.now().toString(36)}`,
+          id: `u-${Date.now().toString(36)}-${(userSeq++).toString(36)}`,
         };
         set((s) => ({ extraUsers: [...s.extraUsers, user] }));
         return { ok: true };

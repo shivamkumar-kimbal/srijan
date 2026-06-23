@@ -29,6 +29,7 @@ interface UIState {
 // Falls back to an in-memory store when localStorage is unavailable
 // (SSR, unit tests), so persistence never throws.
 const memory = new Map<string, string>();
+let msgSeq = 0;
 const hasLS = () => {
   try {
     return typeof window !== "undefined" && !!window.localStorage;
@@ -61,7 +62,7 @@ export const useUIStore = create<UIState>()(
             ...s.discussions,
             [oppId]: [
               ...(s.discussions[oppId] ?? []),
-              { ...msg, id: `m-${Date.now().toString(36)}`, at: new Date().toISOString() },
+              { ...msg, id: `m-${Date.now().toString(36)}-${(msgSeq++).toString(36)}`, at: new Date().toISOString() },
             ],
           },
         })),
