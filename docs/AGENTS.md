@@ -38,24 +38,33 @@ open ../index.html                # prototype UI in browser
 
 ## Known issues / gotchas
 
-1. **web scaffold aborted.** pnpm blocked `sharp` / `unrs-resolver` build scripts and
-   `create-next-app` treated it as failure. Fix by re-creating then approving builds:
-   ```bash
-   cd /Users/shivamkumar/Desktop/srijan-kimbal
-   rm -rf web
-   pnpm create next-app@latest web --ts --tailwind --eslint --app --src-dir \
-     --import-alias "@/*" --use-pnpm --turbopack --yes
-   cd web && pnpm approve-builds   # approve sharp + unrs-resolver, or:
-   # echo 'enable-pre-post-scripts=true' is not needed; instead add to web/.npmrc:
-   #   public-hoist-pattern[]=*
-   # simplest: pnpm config set --location project ... then pnpm install
-   ```
-   If `create-next-app@latest` installs Next 16 and you specifically need **15**, run
-   `pnpm create next-app@15 ...` instead. (Current scaffold pulled Next 16.2.9.)
-2. **JWT middleware exists but is not attached** to any route group yet. Wire it in
+1. **Prod build fails on `/_not-found`.** `cd web && pnpm build` errors only on the auto
+   404 static prerender: `TypeError: Cannot read properties of null (reading 'useState')`.
+   This is a Turbopack + `@tanstack/react-query` + React 19.2 dispatcher quirk, **not** app
+   code — `pnpm dev` renders every route 200 with live data. Fix paths to try:
+   - Build without Turbopack (webpack) for the export step, or
+   - Pin React/react-dom to 19.0.x, or
+   - Make `components/providers.tsx` SSR-safe for the static 404 (e.g. render children
+     without QueryClientProvider when there's no client), or move providers below a route
+     group so the root `/_not-found` doesn't mount them.
+   Dev + all feature pages work today; this only blocks `next build`.
+2. **pnpm 11 build-scripts / deps-check.** Settings live in `web/pnpm-workspace.yaml`
+   (`verifyDepsBeforeRun: false`, `onlyBuiltDependencies: [sharp, unrs-resolver]`), NOT the
+   `pnpm` field in package.json (ignored) or `.npmrc`. An IDE linter may re-inject a
+   malformed `allowBuilds:` block — delete it if builds start failing.
+3. **JWT middleware exists but is not attached** to any route group yet. Wire it in
    `cmd/server/main.go` once auth is real (M4).
-3. **No tests yet.** Add Go table tests for handlers and a Playwright/RTL smoke for web.
-4. `api/srijan.db` is a local artifact — gitignore it (see below).
+4. **No tests yet.** Add Go table tests for handlers and a Playwright/RTL smoke for web.
+5. `api/srijan.db` is a local artifact — gitignored.
+
+## Run the full stack (verified working)
+```bash
+cd api && PORT=8080 go run ./cmd/server     # terminal 1
+cd web && pnpm dev                          # terminal 2 → http://localhost:3000
+```
+All routes return 200; Dashboard/Explore/Detail/Profile/Leaderboards/Projects pull live API
+data (CORS allows :3000). Frontend files: `web/src/app/*` (pages), `web/src/components`,
+`web/src/lib` (api/queries/types/store/utils).
 
 ## Suggested .gitignore (root)
 

@@ -19,9 +19,19 @@ Unreleased = on `main`, not yet tagged.
   CHANGELOG, ROADMAP + root CLAUDE.md, .gitignore.
 - Repo pushed to github.com/shivamkumar-kimbal/srijan (`main`).
 
+- App shell (sidebar + topbar) + UI primitives (Button/Card/Badge/SkillChip).
+- Pages wired to live API: Dashboard, Explore (board + type filter), Opportunity Detail +
+  proposal form (mutation + success), My Projects kanban, Profile, Leaderboards. Stub pages
+  for proposals/automation/jobs/rewards/learning/help. All routes dev-verified 200.
+
 ### Notes
 - Scaffold uses Next 16.2.9 (App Router compatible) rather than 15.
+- pnpm 11 settings moved to `pnpm-workspace.yaml` (`verifyDepsBeforeRun`, `onlyBuiltDependencies`).
+
+### Known issues
+- `pnpm build` fails only on `/_not-found` static prerender (Turbopack + React-Query +
+  React 19.2 `useState` null). Dev unaffected. See AGENTS.md Known issues #1.
 
 ### Pending (see TASKS.md)
-- App shell + Dashboard/Explore/Detail/Profile/Insights pages wired to API.
+- Fix prod-build 404 prerender; mobile responsive; Post-Opportunity form.
 - Azure AD auth, Postgres migrations, S3, Helm/CI/ArgoCD, tests.

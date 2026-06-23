@@ -20,20 +20,27 @@ _Last updated: 2026-06-23_
 - ⬜ Wire JWT to protected routes
 - ⬜ Pagination, validation hardening, error envelope
 
-## M2 — Frontend scaffold  🟡
-- 🟡 `pnpm create next-app web` (Next 16/15, TS, Tailwind v4, App Router, src dir) — **install aborted on pnpm build-script approval; needs re-run** (see AGENTS.md "Known issues")
-- ⬜ shadcn/ui init + theme tokens from DESIGN.md
-- ⬜ TanStack Query provider + Zustand store
-- ⬜ API client (`lib/api.ts`) reading `NEXT_PUBLIC_API_URL`
-- ⬜ App shell: sidebar + topbar layout
+## M2 — Frontend scaffold  ✅
+- ✅ Next.js (16.2.9, TS, Tailwind v4, App Router, src dir)
+- ✅ Theme tokens from DESIGN.md + Hanken/JetBrains fonts
+- ✅ TanStack Query provider + Zustand store
+- ✅ API client (`lib/api.ts`) + typed hooks (`lib/queries.ts`) reading `NEXT_PUBLIC_API_URL`
+- ✅ App shell: sidebar (11 nav items, availability toggle, Post Project) + topbar
+- ✅ UI primitives (Button, Card, Badge/SkillChip)
 
-## M3 — Core pages wired to API  ⬜
-- ⬜ Dashboard (reference layout)
-- ⬜ Explore / Opportunity Board (GET /opportunities, type filter)
-- ⬜ Opportunity Detail + Proposal form (GET /:id, POST /:id/proposals)
-- ⬜ My Projects Kanban (GET /board)
-- ⬜ Profile (GET /profile)
-- ⬜ Leaderboards / Insights (GET /insights)
+## M3 — Core pages wired to API  ✅ (dev-verified)
+- ✅ Dashboard (hero, Featured Projects from API, How It Works, Your Impact, badges, active projects, internal opps, top contributors)
+- ✅ Explore / Opportunity Board (GET /opportunities, type filter chips w/ counts)
+- ✅ Opportunity Detail + Proposal form (GET /:id, POST /:id/proposals, success state)
+- ✅ My Projects Kanban (GET /board)
+- ✅ Profile (GET /profile)
+- ✅ Leaderboards / Insights (GET /insights)
+- ✅ Stub pages for proposals/automation/jobs/rewards/learning/help (no 404s)
+- ✅ Smoke-verified: all routes 200 via `pnpm dev` against live API, content + data render
+- 🟡 **Known issue:** `pnpm build` (prod) fails only on `/_not-found` static prerender
+  (`useState` null — Turbopack + React-Query + React 19.2 dispatcher quirk). Dev unaffected.
+  Fix path: build w/o Turbopack, or pin React 19.0, or make providers SSR-safe. See AGENTS.md.
+- ⬜ Mobile responsive (sidebar → sheet)
 
 ## M4 — Auth  ⬜
 - ⬜ Azure AD (Entra ID) app registration + OIDC in Next.js (NextAuth or MSAL)
@@ -60,10 +67,10 @@ _Last updated: 2026-06-23_
 - ⬜ K8s manifests / values per env (dev/staging/prod)
 
 ## % Complete (rough)
-- Backend: ~35% · Frontend: ~5% · Auth: 0% · Infra/Deploy: 0% · Docs: 90%
-- Overall MVP: ~15%
+- Backend: ~35% · Frontend: ~55% · Auth: 0% · Infra/Deploy: 0% · Docs: 95%
+- Overall MVP: ~35%
 
 ## Immediate next 3 tasks
-1. Re-run web scaffold cleanly (M2), commit.
-2. shadcn init + app shell + Dashboard page.
-3. Explore + Detail + Proposal flow wired to live API.
+1. Fix `/_not-found` prod-build prerender (Turbopack/React 19.2) — see AGENTS.md.
+2. Mobile responsive (sidebar → sheet); wire "Post Opportunity" form to POST /opportunities.
+3. Auth: Azure AD OIDC in Next.js + JWKS validation in Go (M4).

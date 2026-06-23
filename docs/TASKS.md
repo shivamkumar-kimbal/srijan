@@ -20,14 +20,16 @@ P1 = MVP-critical · P2 = MVP-nice · P3 = post-MVP.
 - [x] Providers (TanStack Query) + Zustand store
 - [x] API client + typed hooks
 - [x] UI primitives (Button, Card, Badge)
-- [ ] App shell: sidebar + topbar
-- [ ] Dashboard page (reference layout)
-- [ ] Explore / Opportunity Board (filter + grid)
-- [ ] Opportunity Detail + Proposal form (mutation + success)
-- [ ] My Projects kanban (GET /board)
-- [ ] Profile page (GET /profile)
-- [ ] Leaderboards / Insights (GET /insights)
+- [x] App shell: sidebar + topbar
+- [x] Dashboard page (reference layout)
+- [x] Explore / Opportunity Board (filter + grid)
+- [x] Opportunity Detail + Proposal form (mutation + success)
+- [x] My Projects kanban (GET /board)
+- [x] Profile page (GET /profile)
+- [x] Leaderboards / Insights (GET /insights)
+- [ ] Fix `/_not-found` prod-build prerender (Turbopack/React 19.2) — see AGENTS.md
 - [ ] Mobile responsive (sidebar → sheet)
+- [ ] Wire "Post Opportunity" form → POST /opportunities
 
 ### Auth
 - [ ] Entra ID app registration (redirect URIs, scopes)
