@@ -3,6 +3,7 @@
 import { usePathname } from "next/navigation";
 import { Sidebar } from "./sidebar";
 import { Topbar } from "./topbar";
+import { AuthGate } from "@/components/auth-gate";
 
 const TITLES: Record<string, string> = {
   "/": "Dashboard",
@@ -16,6 +17,7 @@ const TITLES: Record<string, string> = {
   "/rewards": "Rewards",
   "/learning": "Learning",
   "/help": "Help & Support",
+  "/admin": "Admin · Users & Roles",
 };
 
 function titleFor(path: string) {
@@ -26,12 +28,14 @@ function titleFor(path: string) {
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   return (
-    <div className="flex min-h-screen w-full bg-background text-ink">
-      <Sidebar />
-      <div className="flex-1 flex flex-col min-w-0">
-        <Topbar title={titleFor(pathname)} />
-        <main className="flex-1 overflow-y-auto">{children}</main>
+    <AuthGate>
+      <div className="flex min-h-screen w-full bg-background text-ink">
+        <Sidebar />
+        <div className="flex-1 flex flex-col min-w-0">
+          <Topbar title={titleFor(pathname)} />
+          <main className="flex-1 overflow-y-auto">{children}</main>
+        </div>
       </div>
-    </div>
+    </AuthGate>
   );
 }

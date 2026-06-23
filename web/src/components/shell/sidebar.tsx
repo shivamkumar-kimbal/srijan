@@ -16,9 +16,12 @@ import {
   LifeBuoy,
   Plus,
   Sparkles,
+  Shield,
+  LogOut,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useUIStore } from "@/lib/store";
+import { useAuthStore, useCurrentUser, usePermission } from "@/lib/auth-store";
 
 const NAV = [
   { href: "/", label: "Dashboard", icon: LayoutGrid },
@@ -38,6 +41,11 @@ export function Sidebar() {
   const pathname = usePathname();
   const available = useUIStore((s) => s.available);
   const toggle = useUIStore((s) => s.toggleAvailable);
+  const user = useCurrentUser();
+  const isAdmin = usePermission("admin:access");
+  const logout = useAuthStore((s) => s.logout);
+
+  const nav = isAdmin ? [...NAV, { href: "/admin", label: "Admin", icon: Shield }] : NAV;
 
   return (
     <aside className="w-[250px] flex-none bg-surface border-r border-border flex flex-col py-4 px-3 h-screen sticky top-0">
@@ -52,7 +60,7 @@ export function Sidebar() {
       </div>
 
       <nav className="flex flex-col gap-0.5 overflow-y-auto flex-1 -mx-1 px-1">
-        {NAV.map(({ href, label, icon: Icon }) => {
+        {nav.map(({ href, label, icon: Icon }) => {
           const active = href === "/" ? pathname === "/" : pathname.startsWith(href);
           return (
             <Link
@@ -100,6 +108,25 @@ export function Sidebar() {
       >
         <Plus size={16} strokeWidth={2.4} /> Post Project
       </Link>
+
+      {user && (
+        <div className="mt-2.5 flex items-center gap-2.5 rounded-[11px] border border-border bg-white p-2.5">
+          <div className="w-8 h-8 rounded-[9px] bg-ink text-white flex items-center justify-center font-bold text-[12px] flex-none">
+            {user.initials}
+          </div>
+          <div className="min-w-0 flex-1 leading-tight">
+            <div className="font-bold text-[12.5px] truncate">{user.name}</div>
+            <div className="text-[10.5px] text-muted-2 capitalize">{user.role}</div>
+          </div>
+          <button
+            onClick={logout}
+            aria-label="sign out"
+            className="w-7 h-7 rounded-md text-muted-2 hover:bg-[#F1F0EC] hover:text-ink flex items-center justify-center flex-none"
+          >
+            <LogOut size={15} />
+          </button>
+        </div>
+      )}
     </aside>
   );
 }

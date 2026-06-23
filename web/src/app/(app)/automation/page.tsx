@@ -95,7 +95,7 @@ export default function AutomationPage() {
   const [copied, setCopied] = useState<number | null>(null);
   const [expanded, setExpanded] = useState<number | null>(null);
 
-  async function useTemplate(i: number) {
+  async function copyTemplate(i: number) {
     try {
       await navigator.clipboard.writeText(TEMPLATES[i].snippet);
     } catch {
@@ -147,7 +147,7 @@ export default function AutomationPage() {
 
               <div className="flex items-center gap-2 mt-3">
                 <button
-                  onClick={() => useTemplate(i)}
+                  onClick={() => copyTemplate(i)}
                   className={`inline-flex items-center gap-1.5 h-8 px-3 rounded-[8px] text-[12.5px] font-bold transition-colors ${
                     copied === i ? "bg-green text-white" : "bg-primary text-white hover:bg-[#453dd0]"
                   }`}

@@ -14,13 +14,15 @@ const CHIPS: { key: string; label: string }[] = [
   { key: "innovation", label: "Innovation" },
   { key: "cost", label: "Cost" },
   { key: "techdebt", label: "Tech Debt" },
-  { key: "transfer", label: "Transfers" },
+  { key: "docs", label: "Docs" },
 ];
 
 export default function ExplorePage() {
   const filter = useUIStore((s) => s.filter);
   const setFilter = useUIStore((s) => s.setFilter);
-  const { data: all = [] } = useOpportunities();
+  const { data = [] } = useOpportunities();
+  // Internal transfers are jobs — they live on the Jobs page, not the project board.
+  const all = data.filter((o) => o.type !== "transfer");
   const list = filter === "all" ? all : all.filter((o) => o.type === filter);
 
   const count = (key: string) =>

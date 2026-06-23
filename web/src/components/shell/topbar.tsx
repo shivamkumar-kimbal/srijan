@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Search, Bell, MessageSquare, Sparkles, X, Check } from "lucide-react";
 import { useOpportunities } from "@/lib/queries";
+import { useCurrentUser } from "@/lib/auth-store";
 import { TYPE_META } from "@/lib/types";
 
 type Panel = "search" | "bell" | "chat" | null;
@@ -50,6 +51,7 @@ export function Topbar({ title }: { title: string }) {
   const rootRef = useRef<HTMLDivElement>(null);
 
   const { data: opps = [] } = useOpportunities();
+  const me = useCurrentUser();
 
   const results = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -272,7 +274,7 @@ export function Topbar({ title }: { title: string }) {
           <span className="font-mono font-bold text-[13px] text-gold">1,240</span>
         </div>
         <div className="w-[34px] h-[34px] rounded-[9px] bg-ink text-white flex items-center justify-center font-bold text-[13px]">
-          SK
+          {me?.initials ?? "SK"}
         </div>
       </div>
     </header>
