@@ -1,0 +1,14 @@
+# Go
+api/srijan.db
+api/server
+api/*.test
+
+# Node / Next
+web/node_modules
+web/.next
+web/out
+web/.env*.local
+
+# misc
+.DS_Store
+*.log
